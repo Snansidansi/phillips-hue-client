@@ -1,2 +1,3 @@
-# phillips-hue-desktop-client
-An unofficial desktop client to interact with philips hue lights.
+# phillips-hue-client
+
+An unofficial client to interact with philips hue lights.
