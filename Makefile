@@ -1,3 +1,5 @@
+.PHONY: default build run clean translate translate-update
+
 default: run
 
 build:

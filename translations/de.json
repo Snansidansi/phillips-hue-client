@@ -1,3 +1,6 @@
 {
-    "test": "Hue lights"
+  "menu.favorites": "Favoriten",
+  "menu.lights": "Lampen",
+  "menu.rooms": "Räume",
+  "menu.zones": "Zonen"
 }
