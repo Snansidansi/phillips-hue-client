@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"fyne.io/fyne/v2/data/binding"
 	hueapi "github.com/Snansidansi/hue-api-go"
 )
@@ -19,6 +21,81 @@ func NewAppData() *appData {
 		Zones:  NewBaseGroupData[*zone](),
 		Lights: NewBaseGroupData[*light](),
 	}
+}
+
+func (a *appData) LoadInitialData() error {
+	a.hueClient = getHueClient()
+
+	err := a.LoadRooms()
+	if err != nil {
+		return err
+	}
+
+	err = a.LoadZones()
+	if err != nil {
+		return err
+	}
+
+	err = a.LoadLights()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *appData) LoadLights() error {
+	hueResponse, err := a.hueClient.Lights.GetAllLights()
+	if err != nil {
+		return err
+	}
+	if len(hueResponse.Errors) > 0 {
+		return fmt.Errorf("Hue error: %+v", hueResponse.Errors)
+	}
+	if len(hueResponse.Data) == 0 {
+		return nil
+	}
+
+	for _, l := range hueResponse.Data {
+		a.Lights.Append(l.ID, MapToAppLight(&l))
+	}
+	return nil
+}
+
+func (a *appData) LoadZones() error {
+	hueResponse, err := a.hueClient.Zones.GetZones()
+	if err != nil {
+		return err
+	}
+	if len(hueResponse.Errors) > 0 {
+		return fmt.Errorf("Hue error: %+v", hueResponse.Errors)
+	}
+	if len(hueResponse.Data) == 0 {
+		return nil
+	}
+
+	for _, z := range hueResponse.Data {
+		a.Zones.Append(z.ID, MapToAppZone(&z))
+	}
+	return nil
+}
+
+func (a *appData) LoadRooms() error {
+	hueResponse, err := a.hueClient.Rooms.GetAllRooms()
+	if err != nil {
+		return err
+	}
+	if len(hueResponse.Errors) > 0 {
+		return fmt.Errorf("Hue error: %+v", hueResponse.Errors)
+	}
+	if len(hueResponse.Data) == 0 {
+		return nil
+	}
+
+	for _, r := range hueResponse.Data {
+		a.Rooms.Append(r.ID, MapToAppRoom(&r))
+	}
+	return nil
 }
 
 type Groupable interface {
