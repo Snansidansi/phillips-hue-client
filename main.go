@@ -13,10 +13,11 @@ func main() {
 
 	a := app.New()
 	w := a.NewWindow("Hue Client")
+	appData := NewAppData()
 
 	tabs := container.NewAppTabs(
 		container.NewTabItemWithIcon(lang.X("menu.favorites", "Favorites"), StarIcon, widget.NewLabel("...")),
-		container.NewTabItemWithIcon(lang.X("menu.rooms", "Rooms"), DoorIcon, widget.NewLabel("...")),
+		container.NewTabItemWithIcon(lang.X("menu.rooms", "Rooms"), DoorIcon, CreateRoomPage(appData)),
 		container.NewTabItemWithIcon(lang.X("menu.zones", "Zones"), ZoneIcon, widget.NewLabel("...")),
 		container.NewTabItemWithIcon(lang.X("menu.lights", "Lights"), LightBulbIcon, widget.NewLabel("...")),
 		container.NewTabItemWithIcon("", SettingsIcon, widget.NewLabel("...")),
