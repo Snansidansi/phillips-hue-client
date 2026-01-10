@@ -1,4 +1,4 @@
-package main
+package assets
 
 import (
 	_ "embed"
@@ -13,22 +13,22 @@ func themedIcon(name string, data []byte) fyne.Resource {
 	)
 }
 
-//go:embed assets/door.svg
+//go:embed icons/door.svg
 var door []byte
 var DoorIcon = themedIcon("door.svg", door)
 
-//go:embed assets/star.svg
+//go:embed icons/star.svg
 var star []byte
 var StarIcon = themedIcon("star.svg", star)
 
-//go:embed assets/zone.svg
+//go:embed icons/zone.svg
 var zone []byte
 var ZoneIcon = themedIcon("zone.svg", zone)
 
-//go:embed assets/lightbulb.svg
+//go:embed icons/lightbulb.svg
 var lightbulb []byte
 var LightBulbIcon = themedIcon("lightBulb.svg", lightbulb)
 
-//go:embed assets/settings.svg
+//go:embed icons/settings.svg
 var settings []byte
 var SettingsIcon = themedIcon("settings.svg", settings)

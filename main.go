@@ -6,6 +6,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/lang"
 	"fyne.io/fyne/v2/widget"
+	"github.com/Snansidansi/phillips-hue-client/assets"
 )
 
 func main() {
@@ -16,11 +17,11 @@ func main() {
 	appData := NewAppData()
 
 	tabs := container.NewAppTabs(
-		container.NewTabItemWithIcon(lang.X("menu.favorites", "Favorites"), StarIcon, widget.NewLabel("...")),
-		container.NewTabItemWithIcon(lang.X("menu.rooms", "Rooms"), DoorIcon, CreateRoomPage(appData)),
-		container.NewTabItemWithIcon(lang.X("menu.zones", "Zones"), ZoneIcon, widget.NewLabel("...")),
-		container.NewTabItemWithIcon(lang.X("menu.lights", "Lights"), LightBulbIcon, widget.NewLabel("...")),
-		container.NewTabItemWithIcon("", SettingsIcon, widget.NewLabel("...")),
+		container.NewTabItemWithIcon(lang.X("menu.favorites", "Favorites"), assets.StarIcon, widget.NewLabel("...")),
+		container.NewTabItemWithIcon(lang.X("menu.rooms", "Rooms"), assets.DoorIcon, CreateRoomPage(appData)),
+		container.NewTabItemWithIcon(lang.X("menu.zones", "Zones"), assets.ZoneIcon, widget.NewLabel("...")),
+		container.NewTabItemWithIcon(lang.X("menu.lights", "Lights"), assets.LightBulbIcon, widget.NewLabel("...")),
+		container.NewTabItemWithIcon("", assets.SettingsIcon, widget.NewLabel("...")),
 	)
 
 	tabs.SetTabLocation(container.TabLocationLeading)
