@@ -22,17 +22,17 @@ func getHueClient() *hueapi.Client {
 	}
 
 	apiKey := os.Getenv("HUE_BRIDGE_USERNAME")
-	return hueapi.NewClient(bridge, apiKey, nil, false)
+	return hueapi.NewClient(bridge, apiKey, nil, true)
 }
 
 func MapToAppRoom(hueRoom *models.Room) *room {
-	return NewRoom(hueRoom.Metadata.Name, false, 0)
+	return NewRoom(hueRoom.ID, hueRoom.Metadata.Name, false, 0)
 }
 
 func MapToAppZone(hueZone *models.Zone) *zone {
-	return NewZone(hueZone.Metadata.Name, false, 0)
+	return NewZone(hueZone.ID, hueZone.Metadata.Name, false, 0)
 }
 
 func MapToAppLight(hueLight *models.Light) *light {
-	return NewLight(*hueLight.Metadata.Name, *hueLight.On.On, *hueLight.Dimming.Brightness)
+	return NewLight(hueLight.ID, *hueLight.Metadata.Name, *hueLight.On.On, *hueLight.Dimming.Brightness)
 }

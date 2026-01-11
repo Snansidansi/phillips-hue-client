@@ -9,18 +9,35 @@ type light struct {
 	baseGroup
 }
 
-func NewLight(name string, on bool, brightness float64) *light {
+func NewLight(id, name string, on bool, brightness float64) *light {
 	return &light{
-		baseGroup: NewBaseGroup(name, on, brightness),
+		baseGroup: *NewBaseGroup(id, name, on, brightness),
 	}
 }
 
 func CreateLightPage(appData *appData) fyne.CanvasObject {
 	view := tabListEntryView{Data: appData}
 
-	return widget.NewListWithData(
+	view.SliderOnChanged = func(id string, val float64) {
+		appData.hueClient.Lights.SetBrightness(id, val)
+	}
+
+	list := widget.NewListWithData(
 		appData.Lights.GuiList,
 		view.CreateItem,
 		view.UpdateItem,
 	)
+
+	list.OnSelected = func(id widget.ListItemID) {
+		list.Unselect(id)
+
+		val, _ := view.Data.Lights.GuiList.GetValue(id)
+		light, _ := val.(*light)
+		oldState, _ := light.On.Get()
+
+		view.Data.hueClient.Lights.SetOnOff(light.ID, !oldState)
+		light.On.Set(!oldState)
+	}
+
+	return list
 }

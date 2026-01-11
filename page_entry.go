@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
@@ -33,7 +35,8 @@ func NewTabListEntry(name string, brightness float64) *tabListEntryWidget {
 }
 
 type tabListEntryView struct {
-	Data *appData
+	Data            *appData
+	SliderOnChanged func(id string, val float64)
 }
 
 func (v *tabListEntryView) CreateItem() fyne.CanvasObject {
@@ -48,5 +51,32 @@ func (v *tabListEntryView) UpdateItem(item binding.DataItem, obj fyne.CanvasObje
 	w := obj.(*tabListEntryWidget)
 
 	w.NameLabel.Bind(data.GetName())
+
 	w.BrightnessSlider.Bind(data.GetBrightness())
+	w.BrightnessSlider.OnChanged = func(val float64) {
+		if data.GetValueIsUpdating().Load() {
+			return
+		}
+
+		if time.Since(v.Data.lastSliderUpdate) < sliderChangeIntervallLimit {
+			return
+		}
+
+		data.GetBrightness().Set(val)
+		v.Data.lastSliderUpdate = time.Now()
+		v.SliderOnChanged(data.GetID(), val)
+	}
+	w.BrightnessSlider.OnChangeEnded = func(val float64) {
+		if data.GetValueIsUpdating().Load() {
+			return
+		}
+
+		currentBrightness, _ := data.GetBrightness().Get()
+		if currentBrightness == val {
+			return
+		}
+
+		data.GetBrightness().Set(val)
+		v.SliderOnChanged(data.GetID(), val)
+	}
 }

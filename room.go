@@ -9,9 +9,9 @@ type room struct {
 	baseGroup
 }
 
-func NewRoom(name string, on bool, brightness float64) *room {
+func NewRoom(id, name string, on bool, brightness float64) *room {
 	return &room{
-		baseGroup: NewBaseGroup(name, on, brightness),
+		baseGroup: *NewBaseGroup(id, name, on, brightness),
 	}
 }
 
