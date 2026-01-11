@@ -2,7 +2,7 @@ module github.com/Snansidansi/phillips-hue-client
 
 go 1.23.2
 
-require github.com/Snansidansi/hue-api-go v1.0.4
+require github.com/Snansidansi/hue-api-go v1.0.8
 
 require (
 	fyne.io/systray v1.12.0 // indirect

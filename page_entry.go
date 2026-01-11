@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -54,7 +55,8 @@ func (v *tabListEntryView) UpdateItem(item binding.DataItem, obj fyne.CanvasObje
 
 	w.BrightnessSlider.Bind(data.GetBrightness())
 	w.BrightnessSlider.OnChanged = func(val float64) {
-		if data.GetValueIsUpdating().Load() {
+		currentBrightness, _ := data.GetBrightness().Get()
+		if math.Abs(val-currentBrightness) < 1.0 {
 			return
 		}
 
@@ -67,12 +69,8 @@ func (v *tabListEntryView) UpdateItem(item binding.DataItem, obj fyne.CanvasObje
 		v.SliderOnChanged(data.GetID(), val)
 	}
 	w.BrightnessSlider.OnChangeEnded = func(val float64) {
-		if data.GetValueIsUpdating().Load() {
-			return
-		}
-
 		currentBrightness, _ := data.GetBrightness().Get()
-		if currentBrightness == val {
+		if math.Abs(val-currentBrightness) < 1.0 {
 			return
 		}
 

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"sync/atomic"
 	"time"
 
 	"fyne.io/fyne/v2/data/binding"
@@ -63,9 +62,7 @@ func (a *appData) LoadLights() error {
 
 	for _, l := range hueResponse.Data {
 		appLight := MapToAppLight(&l)
-		appLight.ValueIsUpdating.Store(true)
 		a.Lights.Append(l.ID, appLight)
-		appLight.ValueIsUpdating.Store(false)
 	}
 	return nil
 }
@@ -111,8 +108,6 @@ type Groupable interface {
 	GetName() binding.String
 	GetOn() binding.Bool
 	GetBrightness() binding.Float
-
-	GetValueIsUpdating() *atomic.Bool
 }
 
 type baseGroup struct {
@@ -120,8 +115,6 @@ type baseGroup struct {
 	Name       binding.String
 	On         binding.Bool
 	Brightness binding.Float
-
-	ValueIsUpdating atomic.Bool
 }
 
 func NewBaseGroup(id, name string, on bool, brightness float64) *baseGroup {
@@ -130,8 +123,6 @@ func NewBaseGroup(id, name string, on bool, brightness float64) *baseGroup {
 		Name:       binding.NewString(),
 		On:         binding.NewBool(),
 		Brightness: binding.NewFloat(),
-
-		ValueIsUpdating: atomic.Bool{},
 	}
 
 	group.Name.Set(name)
@@ -155,10 +146,6 @@ func (b *baseGroup) GetOn() binding.Bool {
 
 func (b *baseGroup) GetBrightness() binding.Float {
 	return b.Brightness
-}
-
-func (b *baseGroup) GetValueIsUpdating() *atomic.Bool {
-	return &b.ValueIsUpdating
 }
 
 type baseGroupData[T Groupable] struct {

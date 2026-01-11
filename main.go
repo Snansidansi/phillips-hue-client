@@ -25,6 +25,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	startListenToEventstream(appData)
+
 	tabs := container.NewAppTabs(
 		container.NewTabItemWithIcon(lang.X("menu.favorites", "Favorites"), assets.StarIcon, widget.NewLabel("...")),
 		container.NewTabItemWithIcon(lang.X("menu.rooms", "Rooms"), assets.DoorIcon, CreateRoomPage(appData)),

@@ -25,6 +25,78 @@ func getHueClient() *hueapi.Client {
 	return hueapi.NewClient(bridge, apiKey, nil, true)
 }
 
+func startListenToEventstream(appData *appData) {
+	go func() {
+		eventStream := appData.hueClient.EventStream.GetEventStream(20)
+		errorStream := appData.hueClient.EventStream.GetErrorStream(5)
+		appData.hueClient.EventStream.Start()
+		defer appData.hueClient.EventStream.Stop()
+
+		for {
+			select {
+			case event := <-eventStream:
+				handleStreamEvent(appData, event)
+			case event := <-errorStream:
+				handleStreamError(event)
+			}
+		}
+	}()
+}
+
+func checkResponseInvalid[T any](hueResponse *models.HueResponse[T], err error) bool {
+	if err != nil {
+		fmt.Printf("Error while reaction on eventstream: %v", err)
+		return true
+	}
+	if len(hueResponse.Errors) > 0 {
+		fmt.Printf("Hue error: %+v", hueResponse.Errors)
+		return true
+	}
+	if len(hueResponse.Data) == 0 {
+		return true
+	}
+	return false
+}
+
+func handleStreamEvent(appData *appData, event any) {
+	switch e := event.(type) {
+	case *models.LightChangeEvent:
+		switch e.EventType {
+		case models.EventTypeAdd:
+			hueResponse, err := appData.hueClient.Lights.GetLightByID(e.ID)
+			if checkResponseInvalid(hueResponse, err) {
+				return
+			}
+			appData.Lights.Append(e.ID, MapToAppLight(&hueResponse.Data[0]))
+
+		case models.EventTypeDelete:
+			appData.Lights.Remove(e.ID)
+
+		case models.EventTypeUpdate:
+			light := appData.Lights.ByID[e.ID]
+
+			if !e.StateChanges {
+				hueResponse, err := appData.hueClient.Lights.GetLightByID(e.ID)
+				if checkResponseInvalid(hueResponse, err) {
+					return
+				}
+				light.Name.Set(*hueResponse.Data[0].Metadata.Name)
+				return
+			}
+			if e.On != nil {
+				light.On.Set(*e.On.On)
+			}
+			if e.Dimming != nil {
+				light.Brightness.Set(*e.Dimming.Brightness)
+			}
+		}
+	}
+}
+
+func handleStreamError(err error) {
+	fmt.Println("Hue eventstream error: ", err)
+}
+
 func MapToAppRoom(hueRoom *models.Room) *room {
 	return NewRoom(hueRoom.ID, hueRoom.Metadata.Name, false, 0)
 }
