@@ -36,6 +36,7 @@ func CreateLightPage(appData *appData) *widget.List {
 
 		view.Data.hueClient.Lights.SetOnOff(light.ID, newState)
 		light.On = newState
+		list.RefreshItem(id)
 	}
 
 	return list
