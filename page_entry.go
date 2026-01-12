@@ -10,6 +10,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/widget"
+	"github.com/Snansidansi/phillips-hue-client/assets"
 )
 
 type tabListEntryWidget struct {
@@ -18,22 +19,37 @@ type tabListEntryWidget struct {
 	NameLabel        *widget.Label
 	BrightnessSlider *widget.Slider
 	Background       *canvas.Rectangle
-	Container        *fyne.Container
+	BulbIcon         *widget.Icon
+	FavouriteIcon    *ActionIcon
+
+	Container *fyne.Container
 }
 
 func (t *tabListEntryWidget) CreateRenderer() fyne.WidgetRenderer {
 	return widget.NewSimpleRenderer(t.Container)
 }
 
-func NewTabListEntry(name string, brightness float64) *tabListEntryWidget {
+func NewTabListEntry() *tabListEntryWidget {
 	r := &tabListEntryWidget{
-		NameLabel:        widget.NewLabel(name),
+		NameLabel:        widget.NewLabel(""),
 		BrightnessSlider: widget.NewSlider(0, 100),
 		Background:       canvas.NewRectangle(color.Transparent),
 	}
 
-	r.BrightnessSlider.SetValue(brightness)
-	content := container.NewVBox(r.NameLabel, r.BrightnessSlider)
+	padding := canvas.NewRectangle(color.Transparent)
+	padding.SetMinSize(fyne.NewSize(5, 0))
+
+	r.BulbIcon = widget.NewIcon(nil)
+	r.FavouriteIcon = NewActionIcon(assets.StarBorderIcon, nil)
+
+	icons := container.NewHBox(
+		r.BulbIcon,
+		r.FavouriteIcon,
+		padding,
+	)
+
+	header := container.NewBorder(nil, nil, r.NameLabel, icons, nil)
+	content := container.NewVBox(header, r.BrightnessSlider)
 	r.Container = container.NewStack(r.Background, content)
 
 	r.ExtendBaseWidget(r)
@@ -63,7 +79,7 @@ type tabListEntryView struct {
 }
 
 func (v *tabListEntryView) CreateItem() fyne.CanvasObject {
-	return NewTabListEntry("", 0)
+	return NewTabListEntry()
 }
 
 func (v *tabListEntryView) UpdateItem(item binding.DataItem, obj fyne.CanvasObject) {
@@ -76,6 +92,20 @@ func (v *tabListEntryView) UpdateItem(item binding.DataItem, obj fyne.CanvasObje
 	w.NameLabel.SetText(data.GetName())
 	w.BrightnessSlider.SetValue(data.GetBrightness())
 	w.updateBackground(data.GetBrightness(), data.GetOn(), nil)
+
+	if data.GetOn() {
+		w.BulbIcon.SetResource(assets.LightBulbOnIcon)
+	} else {
+		w.BulbIcon.SetResource(assets.LightBulbOffIcon)
+	}
+
+	w.FavouriteIcon.OnTapped = func() {
+		if w.FavouriteIcon.Resource == assets.StarBorderIcon {
+			w.FavouriteIcon.SetResource(assets.StarFilledIcon)
+			return
+		}
+		w.FavouriteIcon.SetResource(assets.StarBorderIcon)
+	}
 
 	w.BrightnessSlider.OnChanged = func(val float64) {
 		w.updateBackground(val, data.GetOn(), nil)

@@ -32,10 +32,10 @@ func main() {
 	appData.Lights.List = CreateLightPage(appData)
 
 	tabs := container.NewAppTabs(
-		container.NewTabItemWithIcon(lang.X("menu.favorites", "Favorites"), assets.StarIcon, widget.NewLabel("...")),
+		container.NewTabItemWithIcon(lang.X("menu.favorites", "Favorites"), assets.StarBorderIcon, widget.NewLabel("...")),
 		container.NewTabItemWithIcon(lang.X("menu.rooms", "Rooms"), assets.DoorIcon, appData.Rooms.List),
 		container.NewTabItemWithIcon(lang.X("menu.zones", "Zones"), assets.ZoneIcon, appData.Zones.List),
-		container.NewTabItemWithIcon(lang.X("menu.lights", "Lights"), assets.LightBulbIcon, appData.Lights.List),
+		container.NewTabItemWithIcon(lang.X("menu.lights", "Lights"), assets.LightBulbOnIcon, appData.Lights.List),
 		container.NewTabItemWithIcon("", assets.SettingsIcon, widget.NewLabel("...")),
 	)
 
