@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -15,7 +14,7 @@ func NewZone(id, name string, on bool, brightness float64) *zone {
 	}
 }
 
-func CreateZonePage(appData *appData) fyne.CanvasObject {
+func CreateZonePage(appData *appData) *widget.List {
 	view := tabListEntryView{Data: appData}
 
 	return widget.NewListWithData(

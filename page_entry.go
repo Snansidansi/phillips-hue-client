@@ -51,30 +51,25 @@ func (v *tabListEntryView) UpdateItem(item binding.DataItem, obj fyne.CanvasObje
 
 	w := obj.(*tabListEntryWidget)
 
-	w.NameLabel.Bind(data.GetName())
+	w.NameLabel.SetText(data.GetName())
 
-	w.BrightnessSlider.Bind(data.GetBrightness())
+	w.BrightnessSlider.SetValue(data.GetBrightness())
 	w.BrightnessSlider.OnChanged = func(val float64) {
-		currentBrightness, _ := data.GetBrightness().Get()
-		if math.Abs(val-currentBrightness) < 1.0 {
-			return
-		}
-
 		if time.Since(v.Data.lastSliderUpdate) < sliderChangeIntervallLimit {
 			return
 		}
 
-		data.GetBrightness().Set(val)
+		data.SetBrightness(val)
 		v.Data.lastSliderUpdate = time.Now()
 		v.SliderOnChanged(data.GetID(), val)
 	}
 	w.BrightnessSlider.OnChangeEnded = func(val float64) {
-		currentBrightness, _ := data.GetBrightness().Get()
+		currentBrightness := data.GetBrightness()
 		if math.Abs(val-currentBrightness) < 1.0 {
 			return
 		}
 
-		data.GetBrightness().Set(val)
+		data.SetBrightness(val)
 		v.SliderOnChanged(data.GetID(), val)
 	}
 }

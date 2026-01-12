@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"fyne.io/fyne/v2/data/binding"
+	"fyne.io/fyne/v2/widget"
 	hueapi "github.com/Snansidansi/hue-api-go"
 )
 
@@ -105,29 +106,27 @@ func (a *appData) LoadRooms() error {
 
 type Groupable interface {
 	GetID() string
-	GetName() binding.String
-	GetOn() binding.Bool
-	GetBrightness() binding.Float
+	GetName() string
+	GetOn() bool
+	SetOn(state bool)
+	GetBrightness() float64
+	SetBrightness(val float64)
 }
 
 type baseGroup struct {
 	ID         string
-	Name       binding.String
-	On         binding.Bool
-	Brightness binding.Float
+	Name       string
+	On         bool
+	Brightness float64
 }
 
 func NewBaseGroup(id, name string, on bool, brightness float64) *baseGroup {
 	group := baseGroup{
 		ID:         id,
-		Name:       binding.NewString(),
-		On:         binding.NewBool(),
-		Brightness: binding.NewFloat(),
+		Name:       name,
+		On:         on,
+		Brightness: brightness,
 	}
-
-	group.Name.Set(name)
-	group.On.Set(on)
-	group.Brightness.Set(brightness)
 
 	return &group
 }
@@ -136,53 +135,64 @@ func (b *baseGroup) GetID() string {
 	return b.ID
 }
 
-func (b *baseGroup) GetName() binding.String {
+func (b *baseGroup) GetName() string {
 	return b.Name
 }
 
-func (b *baseGroup) GetOn() binding.Bool {
+func (b *baseGroup) GetOn() bool {
 	return b.On
 }
 
-func (b *baseGroup) GetBrightness() binding.Float {
+func (b *baseGroup) SetOn(state bool) {
+	b.On = state
+}
+
+func (b *baseGroup) GetBrightness() float64 {
 	return b.Brightness
 }
 
+func (b *baseGroup) SetBrightness(val float64) {
+	b.Brightness = val
+}
+
 type baseGroupData[T Groupable] struct {
-	ByID    map[string]T
-	GuiList binding.UntypedList
+	ByID      map[string]T
+	GuiList   binding.UntypedList
+	GuiListId map[string]int
+	List      *widget.List
 }
 
 func NewBaseGroupData[T Groupable]() *baseGroupData[T] {
 	return &baseGroupData[T]{
-		ByID:    map[string]T{},
-		GuiList: binding.NewUntypedList(),
+		ByID:      map[string]T{},
+		GuiList:   binding.NewUntypedList(),
+		GuiListId: map[string]int{},
+		List:      nil,
 	}
 }
 
 func (b *baseGroupData[T]) Append(id string, data T) {
 	b.GuiList.Append(data)
 	b.ByID[id] = data
+	b.GuiListId[id] = b.GuiList.Length()
 }
 
 func (b *baseGroupData[T]) Remove(id string) {
 	items, _ := b.GuiList.Get()
-	itemPtr := b.ByID[id]
 
-	index := -1
-	for i, item := range items {
-		if any(itemPtr) == item {
-			index = i
-			break
-		}
-	}
-
-	if index == -1 {
+	i, ok := b.GuiListId[id]
+	if !ok {
 		return
 	}
 
-	newRooms := append(items[:index], items[index+1:]...)
-	b.GuiList.Set(newRooms)
+	newData := append(items[:i], items[i+1:]...)
+	b.GuiList.Set(newData)
 
 	delete(b.ByID, id)
+
+	newGuiListID := make(map[string]int, len(b.GuiListId)-1)
+	for i := range b.GuiList.Length() - 1 {
+		entry, _ := b.GuiList.GetValue(i)
+		newGuiListID[entry.(T).GetID()] = i
+	}
 }

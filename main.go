@@ -27,11 +27,15 @@ func main() {
 
 	startListenToEventstream(appData)
 
+	appData.Rooms.List = CreateRoomPage(appData)
+	appData.Zones.List = CreateZonePage(appData)
+	appData.Lights.List = CreateLightPage(appData)
+
 	tabs := container.NewAppTabs(
 		container.NewTabItemWithIcon(lang.X("menu.favorites", "Favorites"), assets.StarIcon, widget.NewLabel("...")),
-		container.NewTabItemWithIcon(lang.X("menu.rooms", "Rooms"), assets.DoorIcon, CreateRoomPage(appData)),
-		container.NewTabItemWithIcon(lang.X("menu.zones", "Zones"), assets.ZoneIcon, CreateZonePage(appData)),
-		container.NewTabItemWithIcon(lang.X("menu.lights", "Lights"), assets.LightBulbIcon, CreateLightPage(appData)),
+		container.NewTabItemWithIcon(lang.X("menu.rooms", "Rooms"), assets.DoorIcon, appData.Rooms.List),
+		container.NewTabItemWithIcon(lang.X("menu.zones", "Zones"), assets.ZoneIcon, appData.Zones.List),
+		container.NewTabItemWithIcon(lang.X("menu.lights", "Lights"), assets.LightBulbIcon, appData.Lights.List),
 		container.NewTabItemWithIcon("", assets.SettingsIcon, widget.NewLabel("...")),
 	)
 

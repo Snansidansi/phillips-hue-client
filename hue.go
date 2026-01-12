@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/widget"
 	hueapi "github.com/Snansidansi/hue-api-go"
 	"github.com/Snansidansi/hue-api-go/models"
 	"github.com/joho/godotenv"
@@ -74,20 +76,24 @@ func handleStreamEvent(appData *appData, event any) {
 
 		case models.EventTypeUpdate:
 			light := appData.Lights.ByID[e.ID]
+			defer fyne.DoAndWait(func() {
+				listEntryID := appData.Lights.GuiListId[e.ID]
+				appData.Lights.List.RefreshItem(widget.ListItemID(listEntryID))
+			})
 
 			if !e.StateChanges {
 				hueResponse, err := appData.hueClient.Lights.GetLightByID(e.ID)
 				if checkResponseInvalid(hueResponse, err) {
 					return
 				}
-				light.Name.Set(*hueResponse.Data[0].Metadata.Name)
+				light.Name = *hueResponse.Data[0].Metadata.Name
 				return
 			}
 			if e.On != nil {
-				light.On.Set(*e.On.On)
+				light.On = *e.On.On
 			}
 			if e.Dimming != nil {
-				light.Brightness.Set(*e.Dimming.Brightness)
+				light.Brightness = *e.Dimming.Brightness
 			}
 		}
 	}

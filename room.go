@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -15,7 +14,7 @@ func NewRoom(id, name string, on bool, brightness float64) *room {
 	}
 }
 
-func CreateRoomPage(appData *appData) fyne.CanvasObject {
+func CreateRoomPage(appData *appData) *widget.List {
 	view := tabListEntryView{Data: appData}
 
 	return widget.NewListWithData(
